@@ -57,10 +57,9 @@ app.get("/scrape", function(req, res) {
       var result = {};
 
       // Add the text and href of every link, and save them as properties of the result object
-      // result.headline = $(this)
-      //   .children("a")
-      //   .children("h1")
-      //   .text();
+      result.headline = $("h1", this).text();
+      
+      result.summary = $("p", this).text();
       // result.summary = $(this).children(".content > p").text();
 
       result.link = $("a.headline").attr("href");
@@ -69,7 +68,7 @@ app.get("/scrape", function(req, res) {
       db.Article.create(result)
         .then(function(dbArticle) {
           // View the added result in the console
-          console.log(dbArticle);
+          // console.log(dbArticle);
         })
         .catch(function(err) {
           // If an error occurred, log it
