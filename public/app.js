@@ -3,8 +3,9 @@ $.getJSON("/articles", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
     // Display the apropos information on the page
+
     $("#articles").append(
-      "<h4 data-id='" +
+      "<div class = 'callout'> <h4 data-id='" +
         data[i]._id +
         "'>" +
         data[i].headline +
@@ -20,7 +21,7 @@ $.getJSON("/articles", function(data) {
         data[i].link +
         "'>" +
         "click for more" +
-        "</p>"
+        "</p></div>"
     );
   }
 });
@@ -41,7 +42,7 @@ $(document).on("click", "p.summary", function() {
     .then(function(data) {
       console.log(data);
       // The headline of the article
-      $("#notes").append("<h2>" + data.headline + "</h2>");
+      $("#notes").append("<h6>" + data.headline + "</h6>");
       // An input to enter a new title
       $("#notes").append("<input id='titleinput' name='title' >");
       // A textarea to add a new note body

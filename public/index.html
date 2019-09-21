@@ -3,16 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <title>Scraping With Mongoose</title>
+    <link rel="stylesheet" href="/assets/css/foundation.css" />
     <link rel="stylesheet" href="/assets/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Exo:Bold|Ubuntu:300&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div id="wrapper">
-      <h1>News Scraper</h1>
-      <h2><i>You can do this!</i></h2>
-      <div id="articles"></div>
-      <div id="notes"></div>
+    <div class="grid-container" id="wrapper">
+      <div class="grid-x" id="topPanel">
+        <div class="cell auto"><h1>News Scraper</h1></div>
+
+      </div>
+      <div class="grid-x grid-padding-x">
+        <div id="articles" class="cell auto"></div>
+        <div class="cell small-4" id="notes"></div>
+      </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="app.js"></script>
+    <script src="/public/assets/js/vendor/foundation.js"></script>
   </body>
 </html>

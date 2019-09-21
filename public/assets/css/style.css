@@ -1,11 +1,50 @@
-* {
+body {
+  background: linear-gradient(
+    60deg,
+    #7db9e8 0%,
+    #bf6cf6 4%,
+    #2ac2e0 45%,
+    #73a9d6 67%,
+    #bf6cf6 90%,
+    #33cbe6 100%
+  );
+}
+
+p {
+  font-family: "Ubuntu", sans-serif;
+}
+
+h1,
+h2,
+h4 {
+  font-family: "Exo", sans-serif;
+  font-weight: bold;
+}
+
+#topPanel {
+  background-color: whitesmoke;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  padding: 2rem;
+  padding-bottom: 1rem;
+  padding-top: 6rem;
+  margin-bottom: 2rem;
+  border-radius: 0px 0px 6rem 1rem;
+}
+
+.callout {
+  background-color: rgb(252, 255, 252);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 15px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 0 0 2rem 0.5rem;
+  border-corner-shape: scoop;
+}
+
+/* * {
   padding: 0.5 rem;
   font-size: 1.2rem;
+}
 
-}
-body {
-  background-color: lightcyan;
-}
+
+
 #wrapper {
   width: 960px;
   margin-left: auto;
@@ -36,4 +75,4 @@ input {
 textarea {
   height: 200px;
   font-size: 18px;
-}
+} */

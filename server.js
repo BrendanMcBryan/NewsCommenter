@@ -37,7 +37,6 @@ mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
 
 // Routes
 
-
 // A GET route for scraping the AP Top News Wire website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
@@ -56,11 +55,11 @@ app.get("/scrape", function(req, res) {
 
       // Add the text and href of every link, and save them as properties of the result object
       result.headline = $("h1", this).text();
-      
+
       result.summary = $("p", this).text();
       // result.summary = $(this).children(".content > p").text();
 
-      result.link = $("a.headline").attr("href");
+      result.link = $("a.headline", this).attr("href");
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
