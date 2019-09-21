@@ -37,15 +37,13 @@ mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
 
 // Routes
 
-// TODO get this to the NY TIMES
-// A GET route for scraping the echoJS website
+
+// A GET route for scraping the AP Top News Wire website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
   axios.get("https://apnews.com/apf-topnews").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
-
-    // Now, we grab every h2 within an article tag, and do the following:
 
     // ! we need all the stuff from a .FeedCard class
     // ! headline is <h1>
