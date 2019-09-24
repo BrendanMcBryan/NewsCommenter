@@ -27,7 +27,10 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost/newsScraperGlobalIssues", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // ! Below is the code for connecting to Heroku DB ¡
 // // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
@@ -37,29 +40,53 @@ mongoose.connect("mongodb://localhost/newsScraper", { useNewUrlParser: true });
 
 // Routes
 
+// ? This no longer working, Seems like I hit the AP site a bit too much and the decided they are not THAT much of a news service.
 // A GET route for scraping the AP Top News Wire website
+// app.get("/scrape", function(req, res) {
+//   // First, we grab the body of the html with axios
+//   axios.get("https://apnews.com/apf-topnews").then(function(response) {
+//     // Then, we load that into cheerio and save it to $ for a shorthand selector
+//     var $ = cheerio.load(response.data);
+//     // console.log($);
+//     // ! we need all the stuff from a .FeedCard class
+//     // ! headline is <h1>
+//     // ! summary is <p>
+//     // ! link is the <a class = "headline"
+
+//     $(".FeedCard").each(function(i, element) {
+//       // Save an empty result object
+//       var result = {};
+
+//       // Add the text and href of every link, and save them as properties of the result object
+//       result.headline = $("h1", this).text();
+//       console.log(result.headline + "HI 👨‍👩‍👦‍👦");
+//       result.summary = $("p", this).text();
+//       // result.summary = $(this).children(".content > p").text();
+
+//       result.link = $("a.headline", this).attr("href");
+
+// * Trying a differnt, hopefully less snooty site.
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
-  axios.get("https://apnews.com/apf-topnews").then(function(response) {
+  axios.get("http://www.globalissues.org/news").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
-    // ! we need all the stuff from a .FeedCard class
-    // ! headline is <h1>
-    // ! summary is <p>
-    // ! link is the <a class = "headline"
-
-    $("article >.FeedCard").each(function(i, element) {
+    $("li.headline").each(function(i, element) {
       // Save an empty result object
       var result = {};
+      var headlineDiv = $(this).children("h2");
 
-      // Add the text and href of every link, and save them as properties of the result object
-      result.headline = $("h1", this).text();
-
-      result.summary = $("p", this).text();
-      // result.summary = $(this).children(".content > p").text();
-
-      result.link = $("a.headline", this).attr("href");
+      result.headline = $(headlineDiv)
+        .children("a")
+        .text();
+      result.link = $(headlineDiv)
+        .children("a")
+        .attr("href");
+      var summaryP = $("p", this);
+      result.summary = $(summaryP)
+        .not(".page-intro-summary-info")
+        .text();
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)

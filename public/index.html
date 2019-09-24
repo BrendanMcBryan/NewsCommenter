@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8" />
-    <title>Scraping With Mongoose</title>
+    <title>Scraping Cheerio Mongoose Foundation</title>
     <link rel="stylesheet" href="/assets/css/foundation.css" />
     <link rel="stylesheet" href="/assets/css/style.css" />
     <link
@@ -13,11 +13,21 @@
   <body>
     <div class="grid-container" id="wrapper">
       <div class="grid-x" id="topPanel">
-        <div class="cell auto"><h1>News Scraper</h1></div>
+        <div class="cell auto">
+          <h1>Global Issues Scraper</h1>
 
+          <div class="cell auto">
+            <div class="small button-group">
+              <a id="refreshBTN" class="success button">Refresh</a>
+              <a id="savedBTN" class="warning button">Saved</a>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="grid-x grid-padding-x">
         <div id="articles" class="cell auto"></div>
+
         <div class="cell small-4" id="notes"></div>
       </div>
     </div>
