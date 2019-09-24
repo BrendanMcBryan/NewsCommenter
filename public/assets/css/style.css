@@ -16,9 +16,14 @@ p {
 
 h1,
 h2,
-h4 {
+h4,
+h6 {
   font-family: "Exo", sans-serif;
   font-weight: bold;
+}
+
+h6{
+  font-size: .8rem;
 }
 
 #topPanel {
@@ -35,14 +40,16 @@ h4 {
   background-color: rgb(252, 255, 252);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 15px 0 rgba(0, 0, 0, 0.19);
   border-radius: 0 0 2rem 0.5rem;
-  border-corner-shape: scoop;
 }
 
-/* * {
-  padding: 0.5 rem;
-  font-size: 1.2rem;
+.button {
+  border-radius: 0 0 .65rem 0.25rem;
 }
 
+
+
+
+/*
 
 
 #wrapper {

@@ -17,11 +17,15 @@ $.getJSON("/articles", function(data) {
         "</p>" +
         "<p class='artlink'> " +
         "<a href='" +
-        "https://apnews.com" +
+        "http://www.globalissues.org" +
         data[i].link +
         "'>" +
         "click for more" +
-        "</p></div>"
+        "</p>" +
+        "<a href='#' class='tiny alert button' data-id='" +
+        data[i]._id +
+        "'>Save</a>" +
+        " </div>"
     );
   }
 });
