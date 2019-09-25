@@ -109,7 +109,7 @@ app.get("/scrape", function(req, res) {
   });
 });
 
-// Route for getting all Articles from the db
+// * Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
   // Grab every document in the Articles collection
   db.Article.find({})
@@ -123,7 +123,7 @@ app.get("/articles", function(req, res) {
     });
 });
 
-// Route for getting all Saved Articles from the db
+// * Route for getting all Saved Articles from the db
 app.get("/articles/saved", function(req, res) {
   // Grab every saved article in the Articles collection
   db.Article.find({ saved: true })

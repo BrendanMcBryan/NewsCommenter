@@ -2,38 +2,54 @@
 $.getJSON("/articles", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
-    // Display the apropos information on the page
+    // create Callouts for the articles
+    var calloutDIV = $("<div>")
+      .addClass("callout")
+      .attr("data-id", data[i]._id)
+      .attr("id", data[i]._id);
 
-    $("#articles").append(
-      "<div class = 'callout'> <h4 data-id='" +
-        data[i]._id +
-        "'>" +
-        data[i].headline +
-        "</h4>" +
-        "<p class='summary' data-id='" +
-        data[i]._id +
-        "'>" +
-        data[i].summary +
-        "</p>" +
-        "<p class='artlink'> " +
-        "<a href='" +
-        "http://www.globalissues.org" +
-        data[i].link +
-        "'>" +
-        "click for more" +
-        "</p>" +
-        "<a href='#' id='saveArticleBTN' class='tiny alert button' data-id='" +
-        data[i]._id +
-        "'>Save</a>" +
-        " </div>"
-    );
+    var headlineH = $("<h4>")
+      .attr("data-id", data[i]._id)
+      .text(data[i].headline);
+
+    var summaryP = $("<p>")
+      .addClass("summary")
+      .attr("data-id", data[i]._id)
+      .text(data[i].summary);
+
+    var linkP = $("<p>").addClass("artlink");
+
+    var linkA = $("<a>")
+      .attr("href", "http://www.globalissues.org" + data[i].link)
+      .text("See More");
+    linkP.append(linkA);
+
+    var savedDIV = $("<a>")
+      .attr("id", "saveArticleBTN")
+      .addClass("tiny button")
+      .attr("data-id", data[i]._id);
+
+    if (data[i].saved) {
+      savedDIV.addClass("warning").text("Article Saved");
+    } else {
+      savedDIV.addClass("success").text("Save Article");
+    }
+
+    calloutDIV
+      .append(headlineH)
+      .append(summaryP)
+      .append(linkP)
+      .append(savedDIV);
+
+    $("#articles").append(calloutDIV);
   }
 });
 
-// Whenever someone clicks a p tag
+// * Whenever someone clicks a p tag and Wants to add a note
 $(document).on("click", "p.summary", function() {
   // Empty the notes from the note section
-  $("#notes").empty();
+  $(".noteBox").remove();
+
   // Save the id from the p tag
   var thisId = $(this).attr("data-id");
 
@@ -45,16 +61,33 @@ $(document).on("click", "p.summary", function() {
     // With that done, add the note information to the page
     .then(function(data) {
       console.log(data);
-      // The headline of the article
-      $("#notes").append("<h6>" + data.headline + "</h6>");
-      // An input to enter a new title
-      $("#notes").append("<input id='titleinput' name='title' >");
-      // A textarea to add a new note body
-      $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
-      // A button to submit a new note, with the id of the article saved to it
-      $("#notes").append(
-        "<button data-id='" + data._id + "' id='savenote'>Save Note</button>"
-      );
+
+      var noteBox = $("<div>").addClass("callout success noteBox");
+      var noteH6 = $("<h6>").text(data.headline);
+      var noteTitleDiv = $("<input>")
+        .attr("type", "text")
+        .attr("id", "titleinput")
+        .attr("name", "title");
+      var noteTextDiv = $("<textarea>")
+        .attr("row", "4")
+        .attr("id", "bodyinput")
+        .attr("name", "body");
+      var svbtnDiv = $("<button>")
+        .addClass("tiny secondary button")
+        .attr("data-id", data._id)
+        .attr("id", "savenote")
+        .text("Save Note");
+      noteBox
+        .append(noteH6)
+        .append(noteTitleDiv)
+        .append(noteTextDiv)
+        .append(svbtnDiv);
+
+      // $("#notes").append(noteBox);
+      var theDiv = "#" + data._id;
+      var targetDiv = $(theDiv);
+
+      targetDiv.append(noteBox);
 
       // If there's a note in the article
       if (data.note) {
@@ -66,7 +99,7 @@ $(document).on("click", "p.summary", function() {
     });
 });
 
-// When you click the savenote button
+// *  When you click the savenote button
 $(document).on("click", "#savenote", function() {
   // Grab the id associated with the article from the submit button
   var thisId = $(this).attr("data-id");
@@ -87,7 +120,7 @@ $(document).on("click", "#savenote", function() {
       // Log the response
       console.log(data);
       // Empty the notes section
-      $("#notes").empty();
+      $(".noteBox").remove();
     });
 
   // Also, remove the values entered in the input and textarea for note entry
@@ -101,44 +134,57 @@ $(document).on("click", "#saveArticleBTN", function() {
   var thisId = $(this).attr("data-id");
   $.ajax({ method: "POST", url: "/articleSave/" + thisId });
   $(this).text("saved");
-  $(this).attr("disabled", true);
 
   // run a post reguest to update to toggle the saved of the article
 });
 
 // get Just the Saved Articles
 
-$(document).on("click", "#savedBTN", function(){
+$(document).on("click", "#savedBTN", function() {
   $.getJSON("/articles/saved", function(data) {
     // For each one
     $("#articles").empty();
     for (var i = 0; i < data.length; i++) {
-      // Display the apropos information on the page
-  
-      $("#articles").append(
-        "<div class = 'callout'> <h4 data-id='" +
-          data[i]._id +
-          "'>" +
-          data[i].headline +
-          "</h4>" +
-          "<p class='summary' data-id='" +
-          data[i]._id +
-          "'>" +
-          data[i].summary +
-          "</p>" +
-          "<p class='artlink'> " +
-          "<a href='" +
-          "http://www.globalissues.org" +
-          data[i].link +
-          "'>" +
-          "click for more" +
-          "</p>" +
-          "<a href='#' id='saveArticleBTN' class='tiny alert button' data-id='" +
-          data[i]._id +
-          "'>Save</a>" +
-          " </div>"
-      );
+      // create Callouts for the articles
+      var calloutDIV = $("<div>")
+        .addClass("callout")
+        .attr("data-id", data[i]._id)
+        .attr("id", data[i]._id);
+
+      var headlineH = $("<h4>")
+        .attr("data-id", data[i]._id)
+        .text(data[i].headline);
+
+      var summaryP = $("<p>")
+        .addClass("summary")
+        .attr("data-id", data[i]._id)
+        .text(data[i].summary);
+
+      var linkP = $("<p>").addClass("artlink");
+
+      var linkA = $("<a>")
+        .attr("href", "http://www.globalissues.org" + data[i].link)
+        .text("See More");
+      linkP.append(linkA);
+
+      var savedDIV = $("<a>")
+        .attr("id", "saveArticleBTN")
+        .addClass("tiny button")
+        .attr("data-id", data[i]._id);
+
+      if (data[i].saved) {
+        savedDIV.addClass("warning").text("Article Saved");
+      } else {
+        savedDIV.addClass("success").text("Save Article");
+      }
+
+      calloutDIV
+        .append(headlineH)
+        .append(summaryP)
+        .append(linkP)
+        .append(savedDIV);
+
+      $("#articles").append(calloutDIV);
     }
   });
-
-})
+});
