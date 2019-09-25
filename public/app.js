@@ -22,7 +22,7 @@ $.getJSON("/articles", function(data) {
         "'>" +
         "click for more" +
         "</p>" +
-        "<a href='#' class='tiny alert button' data-id='" +
+        "<a href='#' id='saveArticleBTN' class='tiny alert button' data-id='" +
         data[i]._id +
         "'>Save</a>" +
         " </div>"
@@ -94,3 +94,51 @@ $(document).on("click", "#savenote", function() {
   $("#titleinput").val("");
   $("#bodyinput").val("");
 });
+
+// When user clicks save article button
+$(document).on("click", "#saveArticleBTN", function() {
+  // grab the ID associated with the article from the save button
+  var thisId = $(this).attr("data-id");
+  $.ajax({ method: "POST", url: "/articleSave/" + thisId });
+  $(this).text("saved");
+  $(this).attr("disabled", true);
+
+  // run a post reguest to update to toggle the saved of the article
+});
+
+// get Just the Saved Articles
+
+$(document).on("click", "#savedBTN", function(){
+  $.getJSON("/articles/saved", function(data) {
+    // For each one
+    $("#articles").empty();
+    for (var i = 0; i < data.length; i++) {
+      // Display the apropos information on the page
+  
+      $("#articles").append(
+        "<div class = 'callout'> <h4 data-id='" +
+          data[i]._id +
+          "'>" +
+          data[i].headline +
+          "</h4>" +
+          "<p class='summary' data-id='" +
+          data[i]._id +
+          "'>" +
+          data[i].summary +
+          "</p>" +
+          "<p class='artlink'> " +
+          "<a href='" +
+          "http://www.globalissues.org" +
+          data[i].link +
+          "'>" +
+          "click for more" +
+          "</p>" +
+          "<a href='#' id='saveArticleBTN' class='tiny alert button' data-id='" +
+          data[i]._id +
+          "'>Save</a>" +
+          " </div>"
+      );
+    }
+  });
+
+})
