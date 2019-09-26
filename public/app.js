@@ -1,4 +1,5 @@
 // Grab the articles as a json
+
 $.getJSON("/articles", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
@@ -31,6 +32,7 @@ $.getJSON("/articles", function(data) {
 
     if (data[i].saved) {
       savedDIV.addClass("warning").text("Article Saved");
+      calloutDIV.addClass("success");
     } else {
       savedDIV.addClass("success").text("Save Article");
     }
@@ -43,6 +45,59 @@ $.getJSON("/articles", function(data) {
 
     $("#articles").append(calloutDIV);
   }
+});
+
+function loadPage() {}
+
+// * get Just the Saved Articles
+$(document).on("click", "#savedBTN", function() {
+  $.getJSON("/articles/saved", function(data) {
+    // For each one
+    $("#articles").empty();
+    for (var i = 0; i < data.length; i++) {
+      // create Callouts for the articles
+      var calloutDIV = $("<div>")
+        .addClass("callout")
+        .attr("data-id", data[i]._id)
+        .attr("id", data[i]._id);
+
+      var headlineH = $("<h4>")
+        .attr("data-id", data[i]._id)
+        .text(data[i].headline);
+
+      var summaryP = $("<p>")
+        .addClass("summary")
+        .attr("data-id", data[i]._id)
+        .text(data[i].summary);
+
+      var linkP = $("<p>").addClass("artlink");
+
+      var linkA = $("<a>")
+        .attr("href", "http://www.globalissues.org" + data[i].link)
+        .text("See More");
+      linkP.append(linkA);
+
+      var savedDIV = $("<a>")
+        .attr("id", "saveArticleBTN")
+        .addClass("tiny button")
+        .attr("data-id", data[i]._id);
+
+      if (data[i].saved) {
+        savedDIV.addClass("warning").text("Article Saved");
+        calloutDIV.addClass("success");
+      } else {
+        savedDIV.addClass("success").text("Save Article");
+      }
+
+      calloutDIV
+        .append(headlineH)
+        .append(summaryP)
+        .append(linkP)
+        .append(savedDIV);
+
+      $("#articles").append(calloutDIV);
+    }
+  });
 });
 
 // * Whenever someone clicks a p tag and Wants to add a note
@@ -63,7 +118,7 @@ $(document).on("click", "p.summary", function() {
       console.log(data);
 
       var noteBox = $("<div>").addClass("callout success noteBox");
-      var noteH6 = $("<h6>").text(data.headline);
+      // var noteH6 = $("<h6>").text(data.headline);
       var noteTitleDiv = $("<input>")
         .attr("type", "text")
         .attr("id", "titleinput")
@@ -78,7 +133,7 @@ $(document).on("click", "p.summary", function() {
         .attr("id", "savenote")
         .text("Save Note");
       noteBox
-        .append(noteH6)
+        // .append(noteH6)
         .append(noteTitleDiv)
         .append(noteTextDiv)
         .append(svbtnDiv);
@@ -128,20 +183,19 @@ $(document).on("click", "#savenote", function() {
   $("#bodyinput").val("");
 });
 
-// When user clicks save article button
+// * When user clicks save article button
 $(document).on("click", "#saveArticleBTN", function() {
   // grab the ID associated with the article from the save button
   var thisId = $(this).attr("data-id");
+  // run a post reguest to update to toggle the saved of the article
   $.ajax({ method: "POST", url: "/articleSave/" + thisId });
   $(this).text("saved");
 
-  // run a post reguest to update to toggle the saved of the article
 });
 
-// get Just the Saved Articles
-
-$(document).on("click", "#savedBTN", function() {
-  $.getJSON("/articles/saved", function(data) {
+// * Refresh Articles when Refresh button
+$(document).on("click", "#refreshBTN", function() {
+  $.getJSON("/refresh", function(data) {
     // For each one
     $("#articles").empty();
     for (var i = 0; i < data.length; i++) {
@@ -174,6 +228,7 @@ $(document).on("click", "#savedBTN", function() {
 
       if (data[i].saved) {
         savedDIV.addClass("warning").text("Article Saved");
+        calloutDIV.addClass("success");
       } else {
         savedDIV.addClass("success").text("Save Article");
       }
@@ -186,5 +241,8 @@ $(document).on("click", "#savedBTN", function() {
 
       $("#articles").append(calloutDIV);
     }
-  });
+    // loadPage();
+  }).then(location.reload());
 });
+
+// $(document).ready(loadPage());

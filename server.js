@@ -16,7 +16,7 @@ var PORT = 3000;
 // Initialize Express
 var app = express();
 
-// Configure middleware
+// ! Configure middleware
 
 // Use morgan logger for logging requests
 app.use(logger("dev"));
@@ -25,12 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
-
-// Connect to the Mongo DB Locally
-// mongoose.connect("mongodb://localhost/newsScraperGlobalIssues", {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// });
 
 // ! Below is the code for connecting to Heroku DB ¡
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
@@ -42,34 +36,9 @@ mongoose.connect(MONGODB_URI, {
   useUnifiedTopology: true
 });
 
-// Routes
+// ! Routes
 
-// ? This no longer working, Seems like I hit the AP site a bit too much and the decided they are not THAT much of a news service.
-// A GET route for scraping the AP Top News Wire website
-// app.get("/scrape", function(req, res) {
-//   // First, we grab the body of the html with axios
-//   axios.get("https://apnews.com/apf-topnews").then(function(response) {
-//     // Then, we load that into cheerio and save it to $ for a shorthand selector
-//     var $ = cheerio.load(response.data);
-//     // console.log($);
-//     // ! we need all the stuff from a .FeedCard class
-//     // ! headline is <h1>
-//     // ! summary is <p>
-//     // ! link is the <a class = "headline"
-
-//     $(".FeedCard").each(function(i, element) {
-//       // Save an empty result object
-//       var result = {};
-
-//       // Add the text and href of every link, and save them as properties of the result object
-//       result.headline = $("h1", this).text();
-//       console.log(result.headline + "HI 👨‍👩‍👦‍👦");
-//       result.summary = $("p", this).text();
-//       // result.summary = $(this).children(".content > p").text();
-
-//       result.link = $("a.headline", this).attr("href");
-
-// * Trying a differnt, hopefully less snooty site.
+// * we are using www.globalissues.org/news as the site to get our latest issues. Previously we were using the AP but i may have hit the url a bit too ftern and ran into trouble.
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
   axios.get("http://www.globalissues.org/news").then(function(response) {
@@ -109,6 +78,46 @@ app.get("/scrape", function(req, res) {
   });
 });
 
+// * This Route is "refreshes" the database. It will first go thru the current database and delete all unsaved articles, then it will scrape the site and add those the to database.
+app.get("/refresh", function(req, res) {
+  // TODO delete all unsaved articles from the database
+  db.Article.remove({ saved: false });
+
+  // TODO grab the body of the html with axios
+  axios.get("http://www.globalissues.org/news").then(function(response) {
+    // Then, we load that into cheerio and save it to $ for a shorthand selector
+    var $ = cheerio.load(response.data);
+
+    $("li.headline").each(function(i, element) {
+      // Save an empty result object
+      var result = {};
+      var headlineDiv = $(this).children("h2");
+
+      result.headline = $(headlineDiv)
+        .children("a")
+        .text();
+      result.link = $(headlineDiv)
+        .children("a")
+        .attr("href");
+      var summaryP = $("p", this);
+      result.summary = $(summaryP)
+        .not(".page-intro-summary-info")
+        .text();
+
+      // Create a new Article using the `result` object built from scraping
+      db.Article.create(result)
+        .then(function(dbArticle) {
+          // View the added result in the console
+          // console.log(dbArticle);
+        })
+        .catch(function(err) {
+          // If an error occurred, log it
+          console.log(err);
+        });
+    });
+  });
+});
+
 // * Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
   // Grab every document in the Articles collection
@@ -137,7 +146,7 @@ app.get("/articles/saved", function(req, res) {
     });
 });
 
-// Route for grabbing a specific Article by id, populate it with it's note
+// * Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   db.Article.findOne({ _id: req.params.id })
@@ -153,7 +162,7 @@ app.get("/articles/:id", function(req, res) {
     });
 });
 
-// Route for saving/updating an Article's associated Note
+// * Route for saving/updating an Article's associated Note
 app.post("/articles/:id", function(req, res) {
   // Create a new note and pass the req.body to the entry
   db.Note.create(req.body)
@@ -177,7 +186,7 @@ app.post("/articles/:id", function(req, res) {
     });
 });
 
-// route for updating a saved Article
+// * route for updating the saved of an Article
 app.post("/articleSave/:id", function(req, res) {
   db.Article.findOneAndUpdate(
     { _id: req.params.id },
@@ -189,11 +198,6 @@ app.post("/articleSave/:id", function(req, res) {
   });
 });
 
-// Start the server
-// app.listen(PORT, function() {
-//   console.log("App running on port " + PORT + "!");
-// });
-
 app.listen(process.env.PORT || 3000, function() {
   console.log(
     "Express server listening on port %d in %s mode",
@@ -201,3 +205,28 @@ app.listen(process.env.PORT || 3000, function() {
     app.settings.env
   );
 });
+
+// ? This no longer working, Seems like I hit the AP site a bit too much and the decided they are not THAT much of a news service.
+// A GET route for scraping the AP Top News Wire website
+// app.get("/scrape", function(req, res) {
+//   // First, we grab the body of the html with axios
+//   axios.get("https://apnews.com/apf-topnews").then(function(response) {
+//     // Then, we load that into cheerio and save it to $ for a shorthand selector
+//     var $ = cheerio.load(response.data);
+//     // console.log($);
+//     // ! we need all the stuff from a .FeedCard class
+//     // ! headline is <h1>
+//     // ! summary is <p>
+//     // ! link is the <a class = "headline"
+
+//     $(".FeedCard").each(function(i, element) {
+//       // Save an empty result object
+//       var result = {};
+
+//       // Add the text and href of every link, and save them as properties of the result object
+//       result.headline = $("h1", this).text();
+//       console.log(result.headline + "HI 👨‍👩‍👦‍👦");
+//       result.summary = $("p", this).text();
+//       // result.summary = $(this).children(".content > p").text();
+
+//       result.link = $("a.headline", this).attr("href");
